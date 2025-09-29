@@ -1,0 +1,9 @@
+Pillow
+django-crispy-forms
+crispy-bootstrap5
+python-dotenv
+Django>=4.2
+djangorestframework
+django-cors-headers
+django-filter
+djangorestframework-simplejwt
