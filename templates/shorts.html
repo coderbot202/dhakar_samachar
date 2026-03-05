@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Shorts</h1>
+<div class="space-y-6 max-w-md mx-auto">
+  {% for item in shorts %}
+    <article class="bg-black rounded-xl overflow-hidden text-white snap-start">
+      <video class="w-full h-[540px] object-cover" controls preload="none" loading="lazy">
+        <source src="{{ url_for('uploaded_file', filename=item.video_file) }}" type="video/mp4" />
+      </video>
+      <div class="p-3">{{ item.caption }}</div>
+    </article>
+  {% else %}
+    <p>No shorts uploaded yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Search Articles</h1>
+<form class="mb-5">
+  <input name="q" value="{{ q }}" class="border rounded px-3 py-2 w-full" placeholder="Search by title or summary" />
+</form>
+
+<div class="space-y-3">
+  {% for item in results %}
+    <a href="{{ url_for('news_detail', news_id=item.id) }}" class="block bg-white rounded shadow p-4">
+      <p class="font-semibold">{{ item.title }}</p>
+      <p class="text-sm text-slate-600">{{ item.summary }}</p>
+    </a>
+  {% else %}
+    {% if q %}<p>No results found.</p>{% endif %}
+  {% endfor %}
+</div>
+{% endblock %}
