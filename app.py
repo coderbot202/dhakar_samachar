@@ -115,6 +115,30 @@ class Comment(TimestampMixin, db.Model):
     news = db.relationship("News", back_populates="comments")
 
 
+
+
+def seed_default_data() -> None:
+    if not Category.query.first():
+        db.session.add_all(
+            [
+                Category(name="Local", slug="local"),
+                Category(name="National", slug="national"),
+                Category(name="Business", slug="business"),
+            ]
+        )
+    if not Tag.query.first():
+        db.session.add_all([Tag(name="Politics", slug="politics"), Tag(name="Sports", slug="sports")])
+    db.session.commit()
+
+
+def initialize_database() -> None:
+    os.makedirs(IMAGE_DIR, exist_ok=True)
+    os.makedirs(VIDEO_DIR, exist_ok=True)
+    os.makedirs(PDF_DIR, exist_ok=True)
+    db.create_all()
+    seed_default_data()
+
+
 def user_store() -> dict[str, tuple[str, str]]:
     return {
         os.getenv("REPORTER_USERNAME", "reporter"): (
@@ -164,6 +188,18 @@ def role_required(*roles: str):
         return wrapped
 
     return decorator
+
+
+@app.before_request
+def ensure_database_initialized():
+    if app.config.get("DB_BOOTSTRAPPED"):
+        return
+
+    if os.getenv("AUTO_INIT_DB", "true").lower() in {"1", "true", "yes"}:
+        initialize_database()
+        app.config["DB_BOOTSTRAPPED"] = True
+
+
 
 
 @app.route("/")
@@ -472,30 +508,11 @@ def approve_comment(comment_id: int):
 
 @app.cli.command("init-db")
 def init_db_command():
-    os.makedirs(IMAGE_DIR, exist_ok=True)
-    os.makedirs(VIDEO_DIR, exist_ok=True)
-    os.makedirs(PDF_DIR, exist_ok=True)
-    db.create_all()
-
-    if not Category.query.first():
-        db.session.add_all(
-            [
-                Category(name="Local", slug="local"),
-                Category(name="National", slug="national"),
-                Category(name="Business", slug="business"),
-            ]
-        )
-    if not Tag.query.first():
-        db.session.add_all([Tag(name="Politics", slug="politics"), Tag(name="Sports", slug="sports")])
-    db.session.commit()
-
+    initialize_database()
     print("Database initialized.")
 
 
 if __name__ == "__main__":
-    os.makedirs(IMAGE_DIR, exist_ok=True)
-    os.makedirs(VIDEO_DIR, exist_ok=True)
-    os.makedirs(PDF_DIR, exist_ok=True)
     with app.app_context():
-        db.create_all()
+        initialize_database()
     app.run(debug=True)

@@ -71,3 +71,28 @@ GitHub Actions runs tests for pull requests targeting `main`. On merges (pushes)
 
 - `/privacy-policy`
 - `/terms-and-conditions`
+
+
+## Server deployment with automatic database setup
+
+Yes — you can deploy directly to a server and let the app auto-create tables/seed defaults on first request.
+
+Required env vars:
+- `SECRET_KEY` (strong random value)
+- `DATABASE_URL` (for production DB)
+
+Optional:
+- `AUTO_INIT_DB=true` (default enabled). Set to `false` if you want strict manual DB initialization only.
+
+Example run:
+```bash
+export SECRET_KEY="your-strong-secret"
+export DATABASE_URL="sqlite:////var/www/dhakar/news.db"
+export AUTO_INIT_DB=true
+gunicorn -w 2 -b 0.0.0.0:8000 app:app
+```
+
+You can still initialize manually anytime:
+```bash
+flask --app app init-db
+```

@@ -26,11 +26,11 @@ class SecretKeyImportTest(unittest.TestCase):
         self.assertIn("SECRET_KEY environment variable", result.stderr)
 
 
-class EPaperSanitizationTest(unittest.TestCase):
+class AppSecurityAndBootstrapTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.repo_root = Path(__file__).resolve().parents[1]
         os.environ["SECRET_KEY"] = "test-secret-key"
+        os.environ["AUTO_INIT_DB"] = "true"
         cls.db_fd, cls.db_path = tempfile.mkstemp(suffix=".db")
         os.environ["DATABASE_URL"] = f"sqlite:///{cls.db_path}"
 
@@ -56,11 +56,13 @@ class EPaperSanitizationTest(unittest.TestCase):
         with self.app_module.app.app_context():
             self.app_module.db.drop_all()
             self.app_module.db.create_all()
+        self.app_module.app.config["DB_BOOTSTRAPPED"] = False
 
     def test_invalid_edition_date_rejected_before_file_save(self):
         client = self.app_module.app.test_client()
         with client.session_transaction() as sess:
-            sess["is_admin"] = True
+            sess["username"] = "admin"
+            sess["role"] = self.app_module.ROLE_ADMIN
 
         response = client.post(
             "/admin/epaper",
@@ -80,6 +82,15 @@ class EPaperSanitizationTest(unittest.TestCase):
 
         pdf_files = list(Path(self.app_module.PDF_DIR).glob("*.pdf"))
         self.assertEqual(pdf_files, [])
+
+    def test_auto_init_db_seeds_default_records_on_first_request(self):
+        client = self.app_module.app.test_client()
+        response = client.get("/", follow_redirects=False)
+        self.assertEqual(response.status_code, 200)
+
+        with self.app_module.app.app_context():
+            self.assertGreaterEqual(self.app_module.Category.query.count(), 3)
+            self.assertGreaterEqual(self.app_module.Tag.query.count(), 2)
 
 
 if __name__ == "__main__":
