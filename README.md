@@ -16,6 +16,7 @@ A Flask + Tailwind starter for a dynamic news platform with:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+export SECRET_KEY="replace-with-a-strong-random-secret"
 flask --app app init-db
 flask --app app run
 ```
@@ -27,6 +28,10 @@ Open:
 Default admin credentials (change via env vars):
 - `ADMIN_USERNAME=admin`
 - `ADMIN_PASSWORD=admin123`
+
+
+Environment requirements:
+- `SECRET_KEY` must be set to a strong, non-default value. The app now fails fast if it is missing or set to `dev-secret-key`.
 
 ## Data model
 
@@ -51,3 +56,7 @@ Uploaded assets are stored under `uploads/`:
 - `uploads/images`
 - `uploads/videos`
 - `uploads/pdfs`
+
+## CI/CD
+
+GitHub Actions runs tests for pull requests targeting `main`. On merges (pushes) to `main`, the workflow triggers production deployment by POSTing to `PRODUCTION_DEPLOY_WEBHOOK` (set this GitHub Actions secret in repository settings).

@@ -27,7 +27,13 @@ ALLOWED_VIDEO_EXTENSIONS = {"mp4", "webm", "mov"}
 ALLOWED_PDF_EXTENSIONS = {"pdf"}
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-secret-key")
+secret_key = os.getenv("SECRET_KEY")
+if not secret_key or secret_key == "dev-secret-key":
+    raise RuntimeError(
+        "SECRET_KEY environment variable must be set to a strong, non-default value."
+    )
+
+app.config["SECRET_KEY"] = secret_key
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv(
     "DATABASE_URL", f"sqlite:///{os.path.join(BASE_DIR, 'news.db')}"
 )
@@ -265,18 +271,25 @@ def add_shorts():
 @app.route("/admin/epaper", methods=["POST"])
 @admin_required
 def add_epaper():
-    edition_date = request.form.get("edition_date")
+    edition_date = request.form.get("edition_date", "").strip()
     pdf = request.files.get("pdf")
 
     if not pdf or not pdf.filename or not allowed_file(pdf.filename, ALLOWED_PDF_EXTENSIONS):
         flash("Valid PDF file is required.", "error")
         return redirect(url_for("admin_dashboard"))
 
-    filename = f"{edition_date}_{secure_filename(pdf.filename)}"
+    try:
+        edition_date_obj = datetime.strptime(edition_date, "%Y-%m-%d").date()
+    except ValueError:
+        flash("Edition date must be in YYYY-MM-DD format.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    safe_edition_date = edition_date_obj.isoformat()
+    filename = f"{safe_edition_date}_{secure_filename(pdf.filename)}"
     pdf_path = os.path.join("pdfs", filename)
     pdf.save(os.path.join(UPLOAD_DIR, pdf_path))
 
-    db.session.add(PDFEdition(edition_date=datetime.strptime(edition_date, "%Y-%m-%d"), pdf_file=pdf_path))
+    db.session.add(PDFEdition(edition_date=edition_date_obj, pdf_file=pdf_path))
     db.session.commit()
     flash("E-paper uploaded.", "success")
     return redirect(url_for("admin_dashboard"))
