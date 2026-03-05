@@ -8,7 +8,7 @@ A Flask + Tailwind starter for a dynamic news platform with:
 - Breaking news ticker
 - WhatsApp sharing button on article pages
 - Comment submission + admin moderation
-- Simple admin authentication
+- Role-based admin panel (Admin, Publisher, Reporter)
 
 ## Quick start
 
@@ -60,3 +60,14 @@ Uploaded assets are stored under `uploads/`:
 ## CI/CD
 
 GitHub Actions runs tests for pull requests targeting `main`. On merges (pushes) to `main`, the workflow triggers production deployment by POSTing to `PRODUCTION_DEPLOY_WEBHOOK` (set this GitHub Actions secret in repository settings).
+
+## Role access
+
+- **Reporter**: upload news as draft only.
+- **Publisher**: upload, edit, and publish reporter/publisher news, plus approve comments and upload shorts/e-paper.
+- **Admin**: full control including categories, tags, tokens, UI-level controls via control panel forms.
+
+## Legal pages
+
+- `/privacy-policy`
+- `/terms-and-conditions`
