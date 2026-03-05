@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Search • Dhakar Samachar{% endblock %}
+{% block content %}
+<h1 class="mb-4 text-2xl font-bold">Search Stories</h1>
+<form class="mb-5">
+  <input name="q" value="{{ q }}" class="w-full rounded-xl border border-slate-300 px-4 py-3" placeholder="Search by headline or summary" />
+</form>
+
+<div class="space-y-3">
+  {% for item in results %}
+    <a href="{{ url_for('news_detail', news_id=item.id) }}" class="block rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200 transition hover:shadow">
+      <p class="font-semibold">{{ item.title }}</p>
+      <p class="mt-1 text-sm text-slate-600">{{ item.summary }}</p>
+    </a>
+  {% else %}
+    {% if q %}<p class="text-slate-600">No results found.</p>{% endif %}
+  {% endfor %}
+</div>
+{% endblock %}

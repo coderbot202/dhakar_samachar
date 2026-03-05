@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+<div class="grid lg:grid-cols-2 gap-4">
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Add Category</h2>
+    <form method="POST" action="{{ url_for('add_category') }}" class="grid gap-2">
+      <input name="name" class="border rounded px-2 py-1" placeholder="Category name" required>
+      <input name="slug" class="border rounded px-2 py-1" placeholder="category-slug" required>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Save Category</button>
+    </form>
+  </section>
+
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Upload News</h2>
+    <form method="POST" action="{{ url_for('add_news') }}" enctype="multipart/form-data" class="grid gap-2">
+      <input name="title" class="border rounded px-2 py-1" placeholder="Title" required>
+      <input name="summary" class="border rounded px-2 py-1" placeholder="Summary" required>
+      <textarea name="content" class="border rounded px-2 py-1" placeholder="Content (HTML supported)" required></textarea>
+      <select name="category_id" class="border rounded px-2 py-1" required>
+        {% for c in categories %}
+          <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      <label class="text-sm"><input type="checkbox" name="is_breaking"> Mark as breaking</label>
+      <input type="file" name="featured_image" accept="image/*" class="border rounded px-2 py-1">
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Publish News</button>
+    </form>
+  </section>
+
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Upload Short</h2>
+    <form method="POST" action="{{ url_for('add_shorts') }}" enctype="multipart/form-data" class="grid gap-2">
+      <input name="caption" class="border rounded px-2 py-1" placeholder="Caption" required>
+      <input type="file" name="video" accept="video/*" class="border rounded px-2 py-1" required>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Upload Short</button>
+    </form>
+  </section>
+
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Upload E-Paper</h2>
+    <form method="POST" action="{{ url_for('add_epaper') }}" enctype="multipart/form-data" class="grid gap-2">
+      <input type="date" name="edition_date" class="border rounded px-2 py-1" required>
+      <input type="file" name="pdf" accept="application/pdf" class="border rounded px-2 py-1" required>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Upload PDF</button>
+    </form>
+  </section>
+</div>
+
+<section class="bg-white rounded shadow p-4 mt-4">
+  <h2 class="font-semibold mb-2">Pending Comments</h2>
+  <div class="space-y-2">
+    {% for comment in pending_comments %}
+      <div class="border rounded p-3 flex items-center justify-between gap-2">
+        <div>
+          <p class="text-sm font-medium">{{ comment.author_name }}</p>
+          <p class="text-sm">{{ comment.body }}</p>
+        </div>
+        <form method="POST" action="{{ url_for('approve_comment', comment_id=comment.id) }}">
+          <button class="bg-green-600 text-white rounded px-3 py-1">Approve</button>
+        </form>
+      </div>
+    {% else %}
+      <p class="text-sm text-slate-500">No pending comments.</p>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

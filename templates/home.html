@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Home • Dhakar Samachar{% endblock %}
+{% block content %}
+<section class="mb-6 rounded-xl bg-slate-900 p-3 text-white">
+  <div class="flex items-center gap-2 text-sm font-semibold">
+    <span class="rounded bg-red-600 px-2 py-1">LIVE</span>
+    <span>Breaking News</span>
+  </div>
+  <div class="mt-2 overflow-x-auto whitespace-nowrap text-sm">
+    {% for item in breaking_news %}
+      <a class="mr-6 inline-block hover:text-yellow-300" href="{{ url_for('news_detail', news_id=item.id) }}">⚡ {{ item.title }}</a>
+    {% else %}
+      <span class="text-slate-300">No breaking stories yet.</span>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="grid gap-6 lg:grid-cols-3">
+  <div class="lg:col-span-2">
+    <h2 class="mb-4 text-2xl font-bold">Top Stories</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      {% for item in featured_news %}
+        <article class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200 transition hover:shadow-md">
+          {% if item.featured_image %}
+            <img loading="lazy" class="h-48 w-full object-cover" src="{{ url_for('uploaded_file', filename=item.featured_image) }}" alt="{{ item.title }}" />
+          {% endif %}
+          <div class="p-4">
+            <div class="mb-2 flex items-center justify-between text-xs uppercase tracking-wide text-slate-500">
+              <span>{{ item.category.name }}</span>
+              <span>{{ item.created_at.strftime('%d %b') }}</span>
+            </div>
+            <a class="line-clamp-2 text-lg font-semibold hover:text-blue-600" href="{{ url_for('news_detail', news_id=item.id) }}">{{ item.title }}</a>
+            <p class="mt-2 text-sm text-slate-600">{{ item.summary }}</p>
+          </div>
+        </article>
+      {% else %}
+        <p class="text-slate-600">No news yet. Add stories from the admin panel.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <aside class="space-y-4">
+    <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <h3 class="mb-2 font-bold">Quick Navigation</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a class="hover:text-blue-600" href="{{ url_for('shorts_feed') }}">▶ Shorts</a></li>
+        <li><a class="hover:text-blue-600" href="{{ url_for('epaper_archive') }}">📰 E-Paper Archive</a></li>
+        <li><a class="hover:text-blue-600" href="{{ url_for('search') }}">🔎 Search Stories</a></li>
+      </ul>
+    </div>
+    <div class="rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 p-4 text-white">
+      <h3 class="text-lg font-bold">Stay Updated</h3>
+      <p class="mt-1 text-sm text-blue-100">Get breaking alerts, local updates, and latest video shorts from the newsroom.</p>
+    </div>
+  </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,78 @@
+name: CI and Production Deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Syntax check
+        run: python -m py_compile app.py wsgi.py
+
+  deploy:
+    name: Deploy to Production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: test
+    environment:
+      name: production
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: ${{ secrets.PROD_PORT }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd ${{ secrets.PROD_APP_PATH }}
+            git fetch --all --prune
+            git checkout main
+            git reset --hard origin/main
+
+            if [ ! -d ".venv" ]; then
+              python3 -m venv .venv
+            fi
+
+            source .venv/bin/activate
+            pip install --upgrade pip
+            pip install -r requirements.txt
+
+            set -a
+            [ -f .env ] && source .env
+            set +a
+
+            flask --app app init-db
+            sudo systemctl daemon-reload
+            sudo systemctl restart dhakar-samachar
+            sudo systemctl is-active --quiet dhakar-samachar
+            if [ -n "${{ secrets.PROD_HEALTHCHECK_URL }}" ]; then
+              curl -fsS "${{ secrets.PROD_HEALTHCHECK_URL }}" >/dev/null
+            fi

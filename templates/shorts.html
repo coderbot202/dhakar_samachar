@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}Shorts • Dhakar Samachar{% endblock %}
+{% block content %}
+<div class="mb-4 flex items-end justify-between">
+  <h1 class="text-2xl font-bold">Shorts Feed</h1>
+  <p class="text-sm text-slate-500">Scroll to switch videos</p>
+</div>
+
+<div data-shorts-container class="mx-auto h-[80vh] max-w-md snap-y snap-mandatory overflow-y-auto rounded-2xl border border-slate-200 bg-black">
+  {% for item in shorts %}
+    <article class="relative h-[80vh] snap-start">
+      <video class="h-full w-full object-cover" controls preload="metadata">
+        <source src="{{ url_for('uploaded_file', filename=item.video_file) }}" type="video/mp4" />
+      </video>
+      <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent p-4 text-white">
+        <p class="text-sm font-medium">{{ item.caption }}</p>
+      </div>
+    </article>
+  {% else %}
+    <div class="flex h-full items-center justify-center p-6 text-center text-white/80">No shorts uploaded yet.</div>
+  {% endfor %}
+</div>
+{% endblock %}
