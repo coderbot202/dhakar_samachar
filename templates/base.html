@@ -14,7 +14,7 @@
           <a href="{{ url_for('shorts_feed') }}">Shorts</a>
           <a href="{{ url_for('epaper_archive') }}">E-Paper</a>
           <a href="{{ url_for('search') }}">Search</a>
-          <a href="{{ url_for('admin_dashboard') }}">Admin</a>
+          <a href="{{ url_for('admin_dashboard') }}">Panel</a>
         </div>
       </nav>
     </header>
@@ -33,5 +33,12 @@
       {% endwith %}
       {% block content %}{% endblock %}
     </main>
+
+    <footer class="border-t bg-white mt-6">
+      <div class="max-w-6xl mx-auto px-4 py-4 text-sm flex gap-4">
+        <a href="{{ url_for('privacy_policy') }}">Privacy Policy</a>
+        <a href="{{ url_for('terms_and_conditions') }}">Terms & Conditions</a>
+      </div>
+    </footer>
   </body>
 </html>
