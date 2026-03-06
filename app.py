@@ -202,6 +202,11 @@ def ensure_database_initialized():
 
 
 
+@app.route("/health")
+def health():
+    return {"status": "ok"}, 200
+
+
 @app.route("/")
 def home():
     featured_news = (

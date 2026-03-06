@@ -1,0 +1,16 @@
+[Unit]
+Description=Dhakar Samachar Gunicorn Service
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/dhakar_samachar
+Environment="SECRET_KEY=replace-with-strong-secret"
+Environment="DATABASE_URL=sqlite:////var/www/dhakar_samachar/news.db"
+Environment="AUTO_INIT_DB=true"
+ExecStart=/var/www/dhakar_samachar/.venv/bin/gunicorn -c deployment/gunicorn.conf.py wsgi:application
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

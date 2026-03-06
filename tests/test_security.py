@@ -83,6 +83,13 @@ class AppSecurityAndBootstrapTest(unittest.TestCase):
         pdf_files = list(Path(self.app_module.PDF_DIR).glob("*.pdf"))
         self.assertEqual(pdf_files, [])
 
+
+    def test_health_endpoint_is_available(self):
+        client = self.app_module.app.test_client()
+        response = client.get('/health')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {'status': 'ok'})
+
     def test_auto_init_db_seeds_default_records_on_first_request(self):
         client = self.app_module.app.test_client()
         response = client.get("/", follow_redirects=False)

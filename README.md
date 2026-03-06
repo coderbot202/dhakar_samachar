@@ -96,3 +96,47 @@ You can still initialize manually anytime:
 ```bash
 flask --app app init-db
 ```
+
+
+## Production setup (fixing 403 Forbidden)
+
+A plain **403 Forbidden** from the browser usually means the web server is serving static files only and your Flask app is not connected to a WSGI runner.
+
+### 1) Required environment variables
+- `SECRET_KEY` (must be strong and non-default)
+- `DATABASE_URL` (recommended: MySQL/Postgres in production)
+- `AUTO_INIT_DB=true` (optional; defaults to true)
+
+### 2) Use a WSGI entrypoint
+This repository now includes:
+- `wsgi.py` for Gunicorn/systemd/Nginx
+- `passenger_wsgi.py` for Passenger-style hosts (e.g., many cPanel/hPanel Python app setups)
+
+### 3) Linux VPS (Nginx + Gunicorn + systemd)
+Use these templates:
+- `deployment/gunicorn.conf.py`
+- `deployment/systemd.service.example`
+- `deployment/nginx.conf.example`
+
+Boot sequence:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+export SECRET_KEY="your-strong-secret"
+export DATABASE_URL="sqlite:////var/www/dhakar_samachar/news.db"
+.venv/bin/gunicorn -c deployment/gunicorn.conf.py wsgi:application
+```
+
+### 4) Hostinger/hPanel style Python app
+For exact click-by-click instructions after uploading code, use: `deployment/HOSTINGER_HPANEL_SETUP.md`.
+
+- Set application startup file to `passenger_wsgi.py` (or WSGI module to `wsgi:application` if panel supports it).
+- Ensure app root has read/execute permissions and `uploads/` is writable.
+- Configure env vars in panel: `SECRET_KEY`, `DATABASE_URL`, `AUTO_INIT_DB`.
+- Restart the Python app from panel.
+
+### 5) Smoke test
+After deploy, verify:
+- `GET /health` returns `{"status":"ok"}`
+- home page `/` loads (not 403)
