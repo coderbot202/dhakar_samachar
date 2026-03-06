@@ -8,7 +8,7 @@ A Flask + Tailwind starter for a dynamic news platform with:
 - Breaking news ticker
 - WhatsApp sharing button on article pages
 - Comment submission + admin moderation
-- Simple admin authentication
+- Role-based admin panel (Admin, Publisher, Reporter)
 
 ## Quick start
 
@@ -16,6 +16,7 @@ A Flask + Tailwind starter for a dynamic news platform with:
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+export SECRET_KEY="replace-with-a-strong-random-secret"
 flask --app app init-db
 flask --app app run
 ```
@@ -27,6 +28,10 @@ Open:
 Default admin credentials (change via env vars):
 - `ADMIN_USERNAME=admin`
 - `ADMIN_PASSWORD=admin123`
+
+
+Environment requirements:
+- `SECRET_KEY` must be set to a strong, non-default value. The app now fails fast if it is missing or set to `dev-secret-key`.
 
 ## Data model
 
@@ -51,3 +56,43 @@ Uploaded assets are stored under `uploads/`:
 - `uploads/images`
 - `uploads/videos`
 - `uploads/pdfs`
+
+## CI/CD
+
+GitHub Actions runs tests for pull requests targeting `main`. On merges (pushes) to `main`, the workflow triggers production deployment by POSTing to `PRODUCTION_DEPLOY_WEBHOOK` (set this GitHub Actions secret in repository settings).
+
+## Role access
+
+- **Reporter**: upload news as draft only.
+- **Publisher**: upload, edit, and publish reporter/publisher news, plus approve comments and upload shorts/e-paper.
+- **Admin**: full control including categories, tags, tokens, UI-level controls via control panel forms.
+
+## Legal pages
+
+- `/privacy-policy`
+- `/terms-and-conditions`
+
+
+## Server deployment with automatic database setup
+
+Yes — you can deploy directly to a server and let the app auto-create tables/seed defaults on first request.
+
+Required env vars:
+- `SECRET_KEY` (strong random value)
+- `DATABASE_URL` (for production DB)
+
+Optional:
+- `AUTO_INIT_DB=true` (default enabled). Set to `false` if you want strict manual DB initialization only.
+
+Example run:
+```bash
+export SECRET_KEY="your-strong-secret"
+export DATABASE_URL="sqlite:////var/www/dhakar/news.db"
+export AUTO_INIT_DB=true
+gunicorn -w 2 -b 0.0.0.0:8000 app:app
+```
+
+You can still initialize manually anytime:
+```bash
+flask --app app init-db
+```

@@ -1,15 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Admin Dashboard</h1>
+<h1 class="text-2xl font-bold mb-1">Control Panel</h1>
+<p class="text-sm text-slate-600 mb-4">Logged in as <strong>{{ username }}</strong> ({{ role|capitalize }})</p>
+
 <div class="grid lg:grid-cols-2 gap-4">
+  {% if role == 'admin' %}
   <section class="bg-white rounded shadow p-4">
-    <h2 class="font-semibold mb-2">Add Category</h2>
+    <h2 class="font-semibold mb-2">Manage Categories</h2>
     <form method="POST" action="{{ url_for('add_category') }}" class="grid gap-2">
       <input name="name" class="border rounded px-2 py-1" placeholder="Category name" required>
       <input name="slug" class="border rounded px-2 py-1" placeholder="category-slug" required>
       <button class="bg-slate-900 text-white rounded px-3 py-2">Save Category</button>
     </form>
   </section>
+
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Manage Tags</h2>
+    <form method="POST" action="{{ url_for('add_tag') }}" class="grid gap-2">
+      <input name="name" class="border rounded px-2 py-1" placeholder="Tag name" required>
+      <input name="slug" class="border rounded px-2 py-1" placeholder="tag-slug" required>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Save Tag</button>
+    </form>
+  </section>
+
+  <section class="bg-white rounded shadow p-4">
+    <h2 class="font-semibold mb-2">Manage Tokens</h2>
+    <form method="POST" action="{{ url_for('add_token') }}" class="grid gap-2">
+      <input name="name" class="border rounded px-2 py-1" placeholder="Token name" required>
+      <input name="token_value" class="border rounded px-2 py-1" placeholder="Token value" required>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">Save Token</button>
+    </form>
+    <div class="mt-3 text-sm space-y-1">
+      {% for token in tokens %}
+        <div class="border rounded px-2 py-1">{{ token.name }}: {{ token.token_value }}</div>
+      {% else %}
+        <p class="text-slate-500">No tokens added yet.</p>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
 
   <section class="bg-white rounded shadow p-4">
     <h2 class="font-semibold mb-2">Upload News</h2>
@@ -22,12 +51,21 @@
           <option value="{{ c.id }}">{{ c.name }}</option>
         {% endfor %}
       </select>
+      <label class="text-sm font-medium">Tags</label>
+      <select name="tags" class="border rounded px-2 py-1" multiple>
+        {% for tag in tags %}
+          <option value="{{ tag.name }}">{{ tag.name }}</option>
+        {% endfor %}
+      </select>
+      {% if role != 'reporter' %}
       <label class="text-sm"><input type="checkbox" name="is_breaking"> Mark as breaking</label>
+      {% endif %}
       <input type="file" name="featured_image" accept="image/*" class="border rounded px-2 py-1">
-      <button class="bg-slate-900 text-white rounded px-3 py-2">Publish News</button>
+      <button class="bg-slate-900 text-white rounded px-3 py-2">{% if role == 'reporter' %}Save Draft{% else %}Publish News{% endif %}</button>
     </form>
   </section>
 
+  {% if role != 'reporter' %}
   <section class="bg-white rounded shadow p-4">
     <h2 class="font-semibold mb-2">Upload Short</h2>
     <form method="POST" action="{{ url_for('add_shorts') }}" enctype="multipart/form-data" class="grid gap-2">
@@ -45,8 +83,42 @@
       <button class="bg-slate-900 text-white rounded px-3 py-2">Upload PDF</button>
     </form>
   </section>
+  {% endif %}
 </div>
 
+<section class="bg-white rounded shadow p-4 mt-4">
+  <h2 class="font-semibold mb-2">News Queue</h2>
+  <div class="space-y-3">
+    {% for item in managed_news %}
+      <div class="border rounded p-3">
+        <div class="flex justify-between items-start gap-2">
+          <div>
+            <p class="font-semibold">{{ item.title }}</p>
+            <p class="text-xs text-slate-600">By {{ item.author_username }} ({{ item.author_role }}) • Status: {{ item.status }}</p>
+          </div>
+          {% if role != 'reporter' and item.status != 'published' %}
+            <form method="POST" action="{{ url_for('publish_news', news_id=item.id) }}">
+              <button class="bg-green-600 text-white rounded px-3 py-1 text-sm">Publish</button>
+            </form>
+          {% endif %}
+        </div>
+        {% if role != 'reporter' %}
+        <form method="POST" action="{{ url_for('edit_news', news_id=item.id) }}" class="grid gap-2 mt-3">
+          <input name="title" value="{{ item.title }}" class="border rounded px-2 py-1" required>
+          <input name="summary" value="{{ item.summary }}" class="border rounded px-2 py-1" required>
+          <textarea name="content" class="border rounded px-2 py-1" required>{{ item.content }}</textarea>
+          <label class="text-sm"><input type="checkbox" name="is_breaking" {% if item.is_breaking %}checked{% endif %}> Breaking</label>
+          <button class="bg-slate-700 text-white rounded px-3 py-1 text-sm">Save Edits</button>
+        </form>
+        {% endif %}
+      </div>
+    {% else %}
+      <p class="text-sm text-slate-500">No news uploaded yet.</p>
+    {% endfor %}
+  </div>
+</section>
+
+{% if role != 'reporter' %}
 <section class="bg-white rounded shadow p-4 mt-4">
   <h2 class="font-semibold mb-2">Pending Comments</h2>
   <div class="space-y-2">
@@ -65,4 +137,5 @@
     {% endfor %}
   </div>
 </section>
+{% endif %}
 {% endblock %}
