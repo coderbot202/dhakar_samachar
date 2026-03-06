@@ -37,3 +37,9 @@ docker-compose up --build
 ## Admin panel control
 
 See `ADMIN_PANEL_CONTROL.md` for role policy, access control flow, and operations checklist.
+
+## ⚠️ Production safety for dhakarsamachar.in
+
+If your live site is currently served directly from PHP files in `public_html`, do **not** upload this entire repository root blindly.
+
+Read `PRODUCTION_DEPLOYMENT_NOTICE.md` before deploying to production.
