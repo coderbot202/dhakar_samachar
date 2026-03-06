@@ -33,3 +33,13 @@ docker-compose up --build
 3. Add Redis cache decorators for homepage and trending endpoints.
 4. Add Elasticsearch indexing and query handlers.
 5. Connect admin/editor UI to backend APIs with React Query.
+
+## Admin panel control
+
+See `ADMIN_PANEL_CONTROL.md` for role policy, access control flow, and operations checklist.
+
+## ⚠️ Production safety for dhakarsamachar.in
+
+If your live site is currently served directly from PHP files in `public_html`, do **not** upload this entire repository root blindly.
+
+Read `PRODUCTION_DEPLOYMENT_NOTICE.md` before deploying to production.
