@@ -13,6 +13,9 @@ if (isset($_GET['theme']) && in_array($_GET['theme'], $supportedThemes, true)) {
 }
 $theme = $_SESSION['theme'] ?? 'sunset';
 
+$adminUsername = getenv('ADMIN_USERNAME') ?: 'admin';
+$adminPassword = getenv('ADMIN_PASSWORD') ?: 'admin123';
+
 $translations = [
     'en' => [
         'site_name' => 'Dhakar Samachar',

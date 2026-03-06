@@ -1,4 +1,6 @@
-<?php require_once __DIR__ . '/includes/header.php'; ?>
+<?php require_once __DIR__ . '/includes/header.php';
+$newsItems = getNewsItems();
+?>
 
 <div class="container">
     <section class="hero p-4 p-lg-5 mb-4 shadow-lg">

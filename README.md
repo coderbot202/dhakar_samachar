@@ -38,6 +38,21 @@ docker-compose up --build
 
 See `ADMIN_PANEL_CONTROL.md` for role policy, access control flow, and operations checklist.
 
+
+## Day-to-day Admin Upload Panel (PHP)
+
+A production-friendly admin panel is now available in the current PHP stack.
+
+- URL: `/admin.php`
+- Default credentials:
+  - Username: `admin`
+  - Password: `admin123`
+- You can override credentials via environment variables:
+  - `ADMIN_USERNAME`
+  - `ADMIN_PASSWORD`
+
+Uploaded articles are saved in `data/news_items.json` and appear automatically on home/search/detail pages.
+
 ## ⚠️ Production safety for dhakarsamachar.in
 
 If your live site is currently served directly from PHP files in `public_html`, do **not** upload this entire repository root blindly.

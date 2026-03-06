@@ -25,6 +25,7 @@ $currentPath = basename($_SERVER['PHP_SELF']);
                 <li class="nav-item"><a class="nav-link <?= $currentPath === 'shorts.php' ? 'active' : ''; ?>" href="shorts.php"><?= t('shorts'); ?></a></li>
                 <li class="nav-item"><a class="nav-link <?= $currentPath === 'epaper.php' ? 'active' : ''; ?>" href="epaper.php"><?= t('epaper'); ?></a></li>
                 <li class="nav-item"><a class="nav-link <?= $currentPath === 'search.php' ? 'active' : ''; ?>" href="search.php"><?= t('search'); ?></a></li>
+                <li class="nav-item"><a class="nav-link <?= $currentPath === 'admin.php' ? 'active' : ''; ?>" href="admin.php">Admin</a></li>
             </ul>
 
             <form class="d-flex gap-2" method="get">
