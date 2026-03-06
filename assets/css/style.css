@@ -1,0 +1,41 @@
+:root {
+    --bg: #111827;
+    --bg-soft: #1f2937;
+    --text: #f9fafb;
+    --accent: #f97316;
+}
+
+body {
+    background: radial-gradient(circle at top right, color-mix(in srgb, var(--accent), #000 80%), var(--bg));
+    color: var(--text);
+    min-height: 100vh;
+}
+
+.theme-sunset { --bg: #1a1025; --bg-soft: #2c1642; --accent: #ff7b54; }
+.theme-ocean { --bg: #051923; --bg-soft: #003554; --accent: #00b4d8; }
+.theme-forest { --bg: #0b1d13; --bg-soft: #1d3b2a; --accent: #6ab04c; }
+
+.glass-nav {
+    backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--bg-soft), transparent 30%);
+}
+
+.hero {
+    border-radius: 1rem;
+    background: linear-gradient(140deg, color-mix(in srgb, var(--accent), #fff 10%), var(--bg-soft));
+    color: white;
+}
+
+.news-card, .content-card {
+    background: color-mix(in srgb, var(--bg-soft), #000 5%);
+    border: 1px solid color-mix(in srgb, var(--accent), transparent 70%);
+    color: var(--text);
+}
+
+.news-img { height: 200px; object-fit: cover; }
+.badge-accent { background: var(--accent); }
+
+a { color: color-mix(in srgb, var(--accent), #fff 20%); }
+a:hover { color: white; }
+
+footer { color: color-mix(in srgb, var(--text), transparent 25%); }

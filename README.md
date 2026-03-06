@@ -1,98 +1,41 @@
-# Dhakar Samachar - Dynamic News & Multimedia Portal
+# Dhakar Samachar (PHP + Bootstrap Edition)
 
-A Flask + Tailwind starter for a dynamic news platform with:
+A Hostinger-friendly PHP news portal rebuilt from the previous Python stack.
 
-- Article publishing (with category + featured image)
-- Shorts video uploads and vertical feed
-- E-paper PDF archive (view/download)
-- Breaking news ticker
-- WhatsApp sharing button on article pages
-- Comment submission + admin moderation
-- Role-based admin panel (Admin, Publisher, Reporter)
+## Highlights
 
-## Quick start
+- ✅ Pure **PHP** (no Python runtime needed)
+- ✅ **Bootstrap 5** responsive UI with Bootstrap Icons
+- ✅ Attractive **multi-color themes** (Sunset, Ocean, Forest)
+- ✅ Built-in **multilanguage support** (English + Bangla)
+- ✅ News home feed, details, search, shorts, e-paper list, legal pages
+
+## Run locally
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-export SECRET_KEY="replace-with-a-strong-random-secret"
-flask --app app init-db
-flask --app app run
+php -S 0.0.0.0:8000
 ```
 
-Open:
-- Home: `http://127.0.0.1:5000/`
-- Admin: `http://127.0.0.1:5000/admin`
+Open `http://localhost:8000`.
 
-Default admin credentials (change via env vars):
-- `ADMIN_USERNAME=admin`
-- `ADMIN_PASSWORD=admin123`
+## Project structure
 
+- `index.php` — home + breaking ticker + latest cards
+- `news.php` — single news detail page
+- `search.php` — title/category search
+- `shorts.php` — embedded video shorts page
+- `epaper.php` — e-paper edition table
+- `privacy.php`, `terms.php` — legal pages
+- `includes/` — shared config, data, helpers, header/footer
+- `assets/css/style.css` — theme + visual styling
 
-Environment requirements:
-- `SECRET_KEY` must be set to a strong, non-default value. The app now fails fast if it is missing or set to `dev-secret-key`.
+## Hostinger deployment
 
-## Data model
+1. Upload all project files to `public_html`.
+2. Ensure PHP 8+ is enabled.
+3. Set your domain root to this folder.
+4. Done — no extra services required.
 
-### Category
-- `id`, `name`, `slug`, timestamps
+## Notes
 
-### News
-- `id`, `title`, `summary`, `content`, `featured_image`, `is_breaking`, `category_id`, timestamps
-
-### Shorts
-- `id`, `caption`, `video_file`, timestamps
-
-### PDFEdition
-- `id`, `edition_date`, `pdf_file`, timestamps
-
-### Comment
-- `id`, `author_name`, `body`, `is_approved`, `news_id`, timestamps
-
-## File uploads
-
-Uploaded assets are stored under `uploads/`:
-- `uploads/images`
-- `uploads/videos`
-- `uploads/pdfs`
-
-## CI/CD
-
-GitHub Actions runs tests for pull requests targeting `main`. On merges (pushes) to `main`, the workflow triggers production deployment by POSTing to `PRODUCTION_DEPLOY_WEBHOOK` (set this GitHub Actions secret in repository settings).
-
-## Role access
-
-- **Reporter**: upload news as draft only.
-- **Publisher**: upload, edit, and publish reporter/publisher news, plus approve comments and upload shorts/e-paper.
-- **Admin**: full control including categories, tags, tokens, UI-level controls via control panel forms.
-
-## Legal pages
-
-- `/privacy-policy`
-- `/terms-and-conditions`
-
-
-## Server deployment with automatic database setup
-
-Yes — you can deploy directly to a server and let the app auto-create tables/seed defaults on first request.
-
-Required env vars:
-- `SECRET_KEY` (strong random value)
-- `DATABASE_URL` (for production DB)
-
-Optional:
-- `AUTO_INIT_DB=true` (default enabled). Set to `false` if you want strict manual DB initialization only.
-
-Example run:
-```bash
-export SECRET_KEY="your-strong-secret"
-export DATABASE_URL="sqlite:////var/www/dhakar/news.db"
-export AUTO_INIT_DB=true
-gunicorn -w 2 -b 0.0.0.0:8000 app:app
-```
-
-You can still initialize manually anytime:
-```bash
-flask --app app init-db
-```
+Current demo content is in `includes/data.php`. Replace it with database-backed content later if needed.
