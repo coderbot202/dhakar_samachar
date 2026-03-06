@@ -1,41 +1,39 @@
-# Dhakar Samachar (PHP + Bootstrap Edition)
+# Dhakar Samachar Monorepo Scaffold
 
-A Hostinger-friendly PHP news portal rebuilt from the previous Python stack.
+This repository now includes a production-focused scaffold for **Dhakar Samachar** with:
 
-## Highlights
+- **Next.js 14 frontend** (`dhakar-samachar-frontend`)
+- **NestJS backend** (`dhakar-samachar-backend`)
+- **Prisma PostgreSQL schema** for newsroom workflows
+- **Docker Compose** stack (PostgreSQL, Redis, Elasticsearch, Nginx)
+- **GitHub Actions CI** baseline
 
-- ✅ Pure **PHP** (no Python runtime needed)
-- ✅ **Bootstrap 5** responsive UI with Bootstrap Icons
-- ✅ Attractive **multi-color themes** (Sunset, Ocean, Forest)
-- ✅ Built-in **multilanguage support** (English + Bangla)
-- ✅ News home feed, details, search, shorts, e-paper list, legal pages
+The legacy PHP prototype is still available at the repository root for reference.
 
-## Run locally
+## Architecture snapshot
+
+- Frontend: App Router pages for public, admin, and auth route groups.
+- Backend: Modular NestJS structure for auth, users, articles, categories, tags, comments, ads, media, analytics, and notifications.
+- Data: Prisma models for users, articles, categories, tags, comments, ads, media, analytics, and homepage sections.
+
+## Run with Docker
 
 ```bash
-php -S 0.0.0.0:8000
+docker-compose up --build
 ```
 
-Open `http://localhost:8000`.
+- Frontend: `http://localhost:3000`
+- Backend API: `http://localhost:4000/api`
+- Nginx gateway: `http://localhost`
 
-## Project structure
+## Next implementation milestones
 
-- `index.php` — home + breaking ticker + latest cards
-- `news.php` — single news detail page
-- `search.php` — title/category search
-- `shorts.php` — embedded video shorts page
-- `epaper.php` — e-paper edition table
-- `privacy.php`, `terms.php` — legal pages
-- `includes/` — shared config, data, helpers, header/footer
-- `assets/css/style.css` — theme + visual styling
+1. Replace controller stubs with service-layer business logic.
+2. Add JWT strategy, RBAC guards, and refresh token persistence.
+3. Add Redis cache decorators for homepage and trending endpoints.
+4. Add Elasticsearch indexing and query handlers.
+5. Connect admin/editor UI to backend APIs with React Query.
 
-## Hostinger deployment
+## Admin panel control
 
-1. Upload all project files to `public_html`.
-2. Ensure PHP 8+ is enabled.
-3. Set your domain root to this folder.
-4. Done — no extra services required.
-
-## Notes
-
-Current demo content is in `includes/data.php`. Replace it with database-backed content later if needed.
+See `ADMIN_PANEL_CONTROL.md` for role policy, access control flow, and operations checklist.
