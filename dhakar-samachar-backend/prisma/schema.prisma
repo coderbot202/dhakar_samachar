@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  JOURNALIST
+  MODERATOR
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  REJECTED
+}
+
+enum PublishStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SPAM
+}
+
+enum HomepageSectionType {
+  TOP_NEWS
+  TRENDING
+  EDITOR_PICK
+  CATEGORY_BLOCK
+  VIDEO
+}
+
+model User {
+  id         String      @id @default(cuid())
+  name       String
+  email      String      @unique
+  password   String
+  role       UserRole    @default(JOURNALIST)
+  avatar     String?
+  status     UserStatus  @default(ACTIVE)
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
+  articles   Article[]
+  comments   Comment[]
+  media      Media[]
+  analytics  Analytics[]
+}
+
+model Article {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  summary         String
+  content         String
+  author_id       String
+  category_id     String
+  status          ArticleStatus   @default(DRAFT)
+  featured        Boolean         @default(false)
+  breaking        Boolean         @default(false)
+  published_at    DateTime?
+  views           Int             @default(0)
+  seo_title       String?
+  seo_description String?
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  author          User            @relation(fields: [author_id], references: [id])
+  category        Category        @relation(fields: [category_id], references: [id])
+  tags            ArticleTag[]
+  comments        Comment[]
+  analytics       Analytics[]
+}
+
+model Category {
+  id         String      @id @default(cuid())
+  name       String
+  slug       String      @unique
+  parent_id  String?
+  order      Int         @default(0)
+  status     PublishStatus @default(ACTIVE)
+  parent     Category?   @relation("CategoryTree", fields: [parent_id], references: [id])
+  children   Category[]  @relation("CategoryTree")
+  articles   Article[]
+  sections   HomepageSection[]
+}
+
+model Tag {
+  id    String       @id @default(cuid())
+  name  String
+  slug  String       @unique
+  links ArticleTag[]
+}
+
+model ArticleTag {
+  article_id String
+  tag_id     String
+  article    Article @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  tag        Tag     @relation(fields: [tag_id], references: [id], onDelete: Cascade)
+
+  @@id([article_id, tag_id])
+}
+
+model Comment {
+  id         String        @id @default(cuid())
+  article_id String
+  user_id    String
+  content    String
+  status     CommentStatus @default(PENDING)
+  created_at DateTime      @default(now())
+  article    Article       @relation(fields: [article_id], references: [id], onDelete: Cascade)
+  user       User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Advertisement {
+  id         String       @id @default(cuid())
+  name       String
+  position   String
+  image_url  String
+  link       String
+  priority   Int          @default(0)
+  start_date DateTime
+  end_date   DateTime
+  status     PublishStatus @default(ACTIVE)
+}
+
+model Media {
+  id          String   @id @default(cuid())
+  file_url    String
+  file_type   String
+  size        Int
+  uploaded_by String
+  created_at  DateTime @default(now())
+  uploader    User     @relation(fields: [uploaded_by], references: [id])
+}
+
+model Analytics {
+  id         String   @id @default(cuid())
+  event_type String
+  article_id String?
+  user_id    String?
+  timestamp  DateTime @default(now())
+  article    Article? @relation(fields: [article_id], references: [id])
+  user       User?    @relation(fields: [user_id], references: [id])
+}
+
+model HomepageSection {
+  id          String              @id @default(cuid())
+  name        String
+  type        HomepageSectionType
+  category_id String?
+  position    Int
+  status      PublishStatus       @default(ACTIVE)
+  category    Category?           @relation(fields: [category_id], references: [id])
+}
