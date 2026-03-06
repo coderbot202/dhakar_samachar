@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/includes/header.php';
 $query = trim($_GET['q'] ?? '');
+$newsItems = getNewsItems();
 $results = $newsItems;
 if ($query !== '') {
     $results = array_values(array_filter($newsItems, function (array $item) use ($query, $lang): bool {
